@@ -1,0 +1,276 @@
+<style>
+    body {
+        background: linear-gradient(135deg, #e8f5e9, #f4fff6);
+        min-height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    .register-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 15px;
+    }
+
+    .register-card{
+        width:100%;
+        max-width:900px;
+        background:#fff;
+        border-radius:28px;
+        padding:40px 30px;
+        box-shadow:0 15px 40px rgba(0,0,0,.08);
+        position:relative;
+    }
+
+    /* HEADER */
+    .top-header{
+        text-align:center;
+        margin-bottom:35px;
+        position:relative;
+    }
+
+    .btn-close-custom{
+        position:absolute;
+        top:0;
+        right:0;
+        width:46px;
+        height:46px;
+        border-radius:14px;
+        background:#f3f4f6;
+        color:#16a34a;
+        text-decoration:none;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:22px;
+        transition:.3s;
+    }
+
+    .btn-close-custom:hover{
+        background:#e5e7eb;
+        transform:rotate(90deg);
+    }
+
+    .system-title-register{
+        font-size:28px;
+        font-weight:800;
+        color:#16a34a;
+        margin-bottom:10px;
+    }
+
+    .system-divider{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:12px;
+        margin-bottom:28px;
+        color:#16a34a;
+        font-size:18px;
+        font-weight:bold;
+    }
+
+    .system-divider::before,
+    .system-divider::after{
+        content:'';
+        width:120px;
+        height:2px;
+        background:#16a34a;
+        border-radius:50px;
+    }
+
+    .register-title{
+        font-size:24px;
+        font-weight:800;
+        color:#1f2937;
+        margin-bottom:4px;
+    }
+
+    .register-subtitle{
+        color:#6b7280;
+        font-size:15px;
+        margin-bottom:25px;
+    }
+
+    /* FORM */
+    .form-label{
+        font-size:12px;
+        letter-spacing:1px;
+        margin-bottom:7px;
+        display:block;
+        color:#4b5563;
+        font-weight:700;
+        text-transform:uppercase;
+    }
+
+    .form-control,
+    .form-select{
+        width:100%;
+        border-radius:14px;
+        padding:13px 15px;
+        background:#f8fafc;
+        border:1px solid #d1d5db;
+        outline:none;
+        box-sizing:border-box;
+    }
+
+    .form-control:focus,
+    .form-select:focus{
+        border-color:#22c55e;
+        box-shadow:0 0 0 4px rgba(34,197,94,.15);
+        background:#fff;
+    }
+
+    .row{
+        display:flex;
+        gap:15px;
+    }
+
+    .col{
+        flex:1;
+    }
+
+    .mb-3{
+        margin-bottom:18px;
+    }
+
+    .mb-4{
+        margin-bottom:25px;
+    }
+
+    /* BUTTONS */
+    .btn-register{
+        width:100%;
+        border:none;
+        border-radius:14px;
+        padding:15px;
+        font-size:16px;
+        font-weight:700;
+        background:linear-gradient(135deg, #16a34a, #22c55e);
+        color:white;
+        cursor:pointer;
+        transition:.3s;
+    }
+
+    .btn-back{
+        width:100%;
+        display:block;
+        border-radius:14px;
+        padding:15px;
+        background:#e8f5e9;
+        color:#166534;
+        border:1px solid #bbf7d0;
+        text-decoration:none;
+        text-align:center;
+        font-weight:700;
+        margin-top:12px;
+        box-sizing:border-box;
+    }
+</style>
+
+<div class="register-wrapper">
+    <div class="register-card">
+
+        <div class="top-header">
+            <a href="/login" class="btn-close-custom">✕</a>
+            <div class="system-title-register">Absence Management System</div>
+            <div class="system-divider">❋</div>
+        </div>
+
+        <div class="register-title">Create Student Account</div>
+        <div class="register-subtitle">Register a new student profile</div>
+
+        <form method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label class="form-label">Profile Picture</label>
+                <input type="file" name="profile_pic" class="form-control" accept="image/*">
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Fullname</label>
+                <input type="text" name="username" class="form-control" placeholder="Enter fullname" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">PASSWORD</label>
+                <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+            </div>
+
+            <div class="row">
+                <div class="col mb-3">
+                    <label class="form-label">PROGRAM</label>
+                    <select name="program" id="program" class="form-select" required>
+                        <option value="" selected disabled>Select Program</option>
+                        {% for program in programs %}
+                        <option value="{{ program.program_name }}">{{ program.program_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col mb-3">
+                    <label class="form-label">YEAR LEVEL</label>
+                    <select name="year_level" id="year_level" class="form-select" required>
+                        <option value="" selected disabled>Select Year</option>
+                        {% for yr in year_levels %}
+                        <option value="{{ yr.year_level[0] }}">{{ yr.year_level }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">SECTION</label>
+                <select name="section" id="section" class="form-select" required>
+                    <option value="">Select Program and Year First</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-register">Register Student</button>
+            <a href="/login" class="btn-back">Already have an account? Login.</a>
+        </form>
+    </div>
+</div>
+
+<script>
+    const programDropdown = document.getElementById("program");
+    const yearDropdown = document.getElementById("year_level");
+    const sectionDropdown = document.getElementById("section");
+
+    // GENERATE A-F SECTIONS FOR ALL
+    const programs = ["BSCS", "BSCRIM", "BSMA", "BPA"];
+    const years = ["1", "2", "3", "4"];
+    const letters = ["A", "B", "C", "D", "E", "F"];
+    const sections = [];
+
+    programs.forEach(p => {
+        years.forEach(y => {
+            letters.forEach(l => {
+                sections.push({
+                    value: `${p}-${y}${l}`,
+                    text: `${p} ${y}${l}`,
+                    program: p,
+                    year: y
+                });
+            });
+        });
+    });
+
+    function filterSections() {
+        const selectedProgram = programDropdown.value;
+        const selectedYear = yearDropdown.value;
+        sectionDropdown.innerHTML = `<option value="">Select Section</option>`;
+        if (!selectedProgram || !selectedYear) return;
+
+        const filtered = sections.filter(s => s.program === selectedProgram && s.year === selectedYear);
+        filtered.forEach(s => {
+            const opt = document.createElement("option");
+            opt.value = s.value;
+            opt.textContent = s.text;
+            sectionDropdown.appendChild(opt);
+        });
+    }
+
+    programDropdown.addEventListener("change", filterSections);
+    yearDropdown.addEventListener("change", filterSections);
+</script>

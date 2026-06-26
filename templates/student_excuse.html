@@ -1,0 +1,107 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-white">
+            <h3 class="mb-0">
+                Excuse Letter Details
+            </h3>
+        </div>
+
+        <div class="card-body">
+
+            <div class="mb-3">
+                <label class="fw-bold">
+                    Date of Absence
+                </label>
+
+                <div class="border rounded p-3 bg-light">
+                    {{ letter[3] }}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="fw-bold">
+                    Reason
+                </label>
+
+                <div class="border rounded p-3 bg-light">
+                    {{ letter[4] }}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="fw-bold">
+                    Status
+                </label>
+
+                <div>
+                    {% if letter[6] == 'Approved' %}
+                        <span class="badge bg-success">
+                            Approved
+                        </span>
+
+                    {% elif letter[6] == 'Rejected' %}
+                        <span class="badge bg-danger">
+                            Rejected
+                        </span>
+
+                    {% else %}
+                        <span class="badge bg-warning text-dark">
+                            Pending
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if letter[5] %}
+            <div class="mb-3">
+                <label class="fw-bold">
+                    Attachment
+                </label>
+                <br>
+
+                <a href="{{ url_for('static', filename='uploads/' + letter[5]) }}"
+                   target="_blank"
+                   class="btn btn-outline-primary">
+                    View Attachment
+                </a>
+            </div>
+            {% endif %}
+
+            <div class="mb-4">
+
+                <label class="fw-bold">
+                    Admin Feedback
+                </label>
+
+                <div class="border rounded p-3 bg-light">
+
+                    {% if letter[8] %}
+                        {{ letter[8] }}
+                    {% else %}
+                        <span class="text-muted">
+                            No feedback from admin yet.
+                        </span>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            <a href="/my_excuses"
+               class="btn btn-secondary">
+                Back
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

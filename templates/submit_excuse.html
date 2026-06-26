@@ -1,0 +1,252 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="container py-4">
+<div class="row justify-content-center">
+
+    <div class="col-lg-10">
+
+        <div class="excuse-card">
+
+            <div class="excuse-header">
+                <h2>Submit Excuse Letter</h2>
+                <p>
+                    Complete the information below to submit an absence
+                    excuse for review and approval.
+                </p>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
+
+                <!-- PROGRAM & SECTION -->
+                <div class="row">
+
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label">
+                            Program
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control readonly-field"
+                            value="{{ program_name }}"
+                            readonly>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label">
+                            Section
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control readonly-field"
+                            value="{{ section_name }}"
+                            readonly>
+                    </div>
+
+                </div>
+
+                <!-- DATE & FILE -->
+                <div class="row">
+
+                    <div class="col-md-6 mb-4">
+
+                        <label class="form-label">
+                            Date of Absence
+                        </label>
+
+                        <input
+                            type="date"
+                            name="absence_date"
+                            class="form-control custom-input"
+                            required>
+
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+
+                        <label class="form-label">
+                            Supporting Document
+                        </label>
+
+                        <input
+                            type="file"
+                            name="proof"
+                            class="form-control custom-input">
+
+                        <small class="form-note">
+                            Upload medical certificates, parent letters, or any supporting proof if available.
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <!-- REASON -->
+                <div class="mb-4">
+
+                    <label class="form-label">
+                        Reason for Absence
+                    </label>
+
+                    <textarea
+                        name="reason"
+                        rows="6"
+                        class="form-control custom-input"
+                        placeholder="Provide a detailed explanation regarding your absence."
+                        required></textarea>
+
+                </div>
+
+                <!-- BUTTONS -->
+                <div class="button-group">
+
+                    <a href="/dashboard" class="btn-cancel">
+                        Back
+                    </a>
+
+                    <button type="submit" class="btn-submit">
+                        Submit Excuse Letter
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+<style>
+
+body{
+    background:#f5f7fa;
+}
+
+.excuse-card{
+    background:#ffffff;
+    border-radius:20px;
+    padding:40px;
+    border:1px solid #e5e7eb;
+    box-shadow:0 10px 35px rgba(0,0,0,.06);
+}
+
+.excuse-header{
+    margin-bottom:30px;
+    padding-bottom:20px;
+    border-bottom:1px solid #eef2f7;
+}
+
+.excuse-header h2{
+    font-size:30px;
+    font-weight:700;
+    color:#1f2937;
+    margin-bottom:8px;
+}
+
+.excuse-header p{
+    margin:0;
+    color:#6b7280;
+    font-size:15px;
+}
+
+.form-label{
+    font-size:12px;
+    font-weight:700;
+    color:#4b5563;
+    text-transform:uppercase;
+    letter-spacing:.8px;
+    margin-bottom:8px;
+}
+
+.custom-input{
+    border-radius:12px;
+    border:1px solid #d1d5db;
+    padding:13px 15px;
+    background:#fff;
+}
+
+.custom-input:focus{
+    border-color:#22c55e;
+    box-shadow:0 0 0 4px rgba(34,197,94,.15);
+}
+
+.readonly-field{
+    background:#f9fafb;
+    border:1px solid #d1d5db;
+    border-radius:12px;
+    padding:13px 15px;
+    color:#374151;
+    font-weight:500;
+}
+
+.form-note{
+    display:block;
+    margin-top:8px;
+    color:#6b7280;
+    font-size:12px;
+}
+
+.button-group{
+    display:flex;
+    justify-content:flex-end;
+    gap:12px;
+    margin-top:10px;
+}
+
+.btn-cancel{
+    text-decoration:none;
+    padding:12px 24px;
+    border-radius:12px;
+    border:1px solid #d1d5db;
+    color:#374151;
+    background:#fff;
+    font-weight:600;
+    transition:.3s;
+}
+
+.btn-cancel:hover{
+    background:#f3f4f6;
+}
+
+.btn-submit{
+    border:none;
+    padding:12px 28px;
+    border-radius:12px;
+    background:#16a34a;
+    color:white;
+    font-weight:600;
+    transition:.3s;
+}
+
+.btn-submit:hover{
+    background:#15803d;
+    transform:translateY(-2px);
+}
+
+@media (max-width:768px){
+
+    .excuse-card{
+        padding:25px;
+    }
+
+    .button-group{
+        flex-direction:column;
+    }
+
+    .btn-cancel,
+    .btn-submit{
+        width:100%;
+        text-align:center;
+    }
+}
+
+</style>
+
+{% endblock %}

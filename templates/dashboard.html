@@ -1,0 +1,202 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="row g-4">
+
+    <!-- PROFILE CARD -->
+    <div class="profile-card h-100">
+    <div class="text-center mb-3">
+        <img src="{{ url_for('static', filename='uploads/' + profile_pic) }}" 
+             class="rounded-circle border border-3 border-white shadow" 
+             style="width: 100px; height: 100px; object-fit: cover;">
+    </div>
+    
+    <div class="profile-label text-center">
+        Student Profile
+    </div>
+
+            <h3 class="profile-name">
+                {{ session['username'] }}
+            </h3>
+
+            <div class="profile-divider"></div>
+
+            <div class="profile-info">
+                <p>
+                    <i class="bi bi-mortarboard-fill"></i>
+                    {{ program }}
+                </p>
+
+                <p>
+                    <i class="bi bi-door-open-fill"></i>
+                    Section {{ section }}
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="col-md-8">
+
+        <div class="row g-4">
+
+            <div class="col-sm-6">
+
+                <a href="/submit_excuse"
+                   class="text-decoration-none">
+
+                    <div class="action-card">
+
+                        <div class="icon-circle submit-icon">
+                            <i class="bi bi-file-earmark-plus-fill"></i>
+                        </div>
+
+                        <h5>
+                            Submit Excuse
+                        </h5>
+
+                        <p>
+                            Create and submit a new excuse letter
+                            for review and approval.
+                        </p>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+            <div class="col-sm-6">
+
+                <a href="/my_excuses"
+                   class="text-decoration-none">
+
+                    <div class="action-card">
+
+                        <div class="icon-circle history-icon">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+
+                        <h5>
+                            My Excuses
+                        </h5>
+
+                        <p>
+                            View submitted excuses and monitor
+                            approval status.
+                        </p>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+    body{
+        background:#f8faf8;
+    }
+
+    /* PROFILE CARD */
+    .profile-card{
+        background:linear-gradient(
+            135deg,
+            #166534,
+            #22c55e
+        );
+        color:white;
+        padding:30px;
+        border-radius:24px;
+        box-shadow:0 15px 35px rgba(34,197,94,.18);
+    }
+
+    .profile-label{
+        font-size:13px;
+        text-transform:uppercase;
+        letter-spacing:1px;
+        opacity:.85;
+        margin-bottom:10px;
+    }
+
+    .profile-name{
+        font-size:28px;
+        font-weight:800;
+        margin-bottom:20px;
+    }
+
+    .profile-divider{
+        height:1px;
+        background:rgba(255,255,255,.25);
+        margin-bottom:20px;
+    }
+
+    .profile-info p{
+        margin-bottom:12px;
+        font-size:15px;
+    }
+
+    .profile-info i{
+        margin-right:10px;
+    }
+
+    /* ACTION CARDS */
+    .action-card{
+        background:white;
+        border-radius:22px;
+        padding:28px;
+        height:100%;
+        border:1px solid #e5e7eb;
+        transition:.3s;
+        box-shadow:0 6px 18px rgba(0,0,0,.05);
+    }
+
+    .action-card:hover{
+        transform:translateY(-6px);
+        box-shadow:0 15px 30px rgba(0,0,0,.08);
+    }
+
+    .icon-circle{
+        width:65px;
+        height:65px;
+        border-radius:18px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:28px;
+        margin-bottom:18px;
+    }
+
+    .submit-icon{
+        background:#dcfce7;
+        color:#15803d;
+    }
+
+    .history-icon{
+        background:#ecfdf5;
+        color:#16a34a;
+    }
+
+    .action-card h5{
+        color:#1f2937;
+        font-weight:700;
+        margin-bottom:10px;
+    }
+
+    .action-card p{
+        color:#6b7280;
+        font-size:14px;
+        margin-bottom:0;
+        line-height:1.6;
+    }
+
+</style>
+
+{% endblock %}

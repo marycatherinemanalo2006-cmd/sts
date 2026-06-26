@@ -1,0 +1,160 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="card shadow-sm p-4">
+
+<!-- ADDED: Student Profile Header Section -->
+<div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+    <img src="{{ url_for('static', filename='uploads/' + (letter[9] if letter[9] else 'default_user.png')) }}" 
+         class="rounded-circle me-3 border shadow-sm" 
+         style="width: 80px; height: 80px; object-fit: cover; background-color: #f8f9fa;">
+    <div>
+        <h2 class="mb-0">Excuse Letter Details</h2>
+        <p class="text-muted mb-0">Submitted by: <strong>{{ letter[1] }}</strong></p>
+    </div>
+</div>
+
+<div class="mb-3">
+    <strong>Student Username:</strong>
+    <p>{{ letter[1] }}</p>
+</div>
+
+<div class="mb-3">
+    <strong>Section:</strong>
+    <p>{{ letter[2] }}</p>
+</div>
+
+<div class="mb-3">
+    <strong>Date of Absence:</strong>
+    <p>{{ letter[3] }}</p>
+</div>
+
+<div class="mb-3">
+    <strong>Reason:</strong>
+
+    <div class="border rounded p-3 bg-light">
+        {{ letter[4] }}
+    </div>
+</div>
+
+<div class="mb-4">
+
+    <strong>Attached File:</strong>
+    <br>
+
+    {% if letter[5] %}
+
+        <a href="{{ url_for('static', filename='uploads/' + letter[5]) }}"
+           target="_blank"
+           class="btn btn-info text-white mt-2">
+
+            View Attachment
+
+        </a>
+
+    {% else %}
+
+        <p class="text-muted">
+            No attachment uploaded.
+        </p>
+
+    {% endif %}
+
+</div>
+
+<div class="mb-4">
+
+    <strong>Status:</strong>
+
+    {% if letter[6] == 'Approved' %}
+        <span class="badge bg-success">
+            Approved
+        </span>
+
+    {% elif letter[6] == 'Rejected' %}
+        <span class="badge bg-danger">
+            Rejected
+        </span>
+
+    {% else %}
+        <span class="badge bg-warning text-dark">
+            Pending
+        </span>
+    {% endif %}
+
+</div>
+
+{% if letter[6] == 'Pending' %}
+
+<form method="POST">
+
+    <div class="mb-4">
+
+        <label class="form-label fw-bold">
+            Admin Feedback (Optional)
+        </label>
+
+        <textarea
+            name="admin_comment"
+            class="form-control"
+            rows="4"
+            placeholder="Write comments, feedback, or explanation..."></textarea>
+
+    </div>
+
+    <div class="d-flex gap-2">
+
+        <button
+            type="submit"
+            formaction="/approve/{{ letter[0] }}"
+            class="btn btn-success">
+
+            Approve
+
+        </button>
+
+        <button
+            type="submit"
+            formaction="/reject/{{ letter[0] }}"
+            class="btn btn-danger">
+
+            Reject
+
+        </button>
+
+    </div>
+
+</form>
+
+{% else %}
+
+<div class="mt-4">
+
+    <strong>Admin Feedback:</strong>
+
+    <div class="border rounded p-3 bg-light mt-2">
+
+        {% if letter[8] %}
+            {{ letter[8] }}
+        {% else %}
+            <span class="text-muted">
+                No feedback provided.
+            </span>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endif %}
+
+<hr>
+
+<a href="/admin" class="btn btn-secondary">
+    Back to Admin Dashboard
+</a>
+
+</div>
+
+{% endblock %}
