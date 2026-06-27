@@ -1,0 +1,10 @@
+# Environments
+envi/
+venv/
+.env
+
+# Databases
+database.db
+
+# Security certificates and keys
+*.pem
