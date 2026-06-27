@@ -171,10 +171,10 @@
 
                 {% for letter in letters %}
                 <tr>
-                  <td class="fw-semibold">
-                        <img src="{{ url_for('static', filename='uploads/' + (letter[5] if letter[5] else 'default_user.png')) }}" 
-                            class="rounded-circle me-2" 
-                            style="width: 35px; height: 35px; object-fit: cover;">
+                  <td class="fw-semibold text-start ps-4">
+                        <img src="{{ letter[5] if letter[5] else 'https://placehold.co/400x400?text=User' }}" 
+                            class="rounded-circle me-2 border" 
+                            style="width: 35px; height: 35px; object-fit: cover; border-color: #166534 !important;">
                         {{ letter[1] }}
                     </td>
 

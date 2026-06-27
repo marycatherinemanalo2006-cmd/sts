@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 import mysql.connector
 import os
+from vercel_blob import put  # NEW: Added for cloud storage
 
 # CHANGED: Added paths for templates and static so Vercel can find them from the /api folder
 app = Flask(__name__, 
@@ -10,7 +11,6 @@ app = Flask(__name__,
 app.secret_key = "excuse_letter_system_2026"
 
 # DATABASE CONFIGURATION (AIVEN)
-
 base_dir = os.path.dirname(os.path.abspath(__file__))
 ca_path = os.path.join(base_dir, '../ca.pem')
 
@@ -77,12 +77,16 @@ def login():
         password = request.form['password']
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT role FROM users WHERE username=%s AND password=%s", (username, password))
+        # UPDATED: Added profile_pic to the SELECT statement
+        cursor.execute("SELECT role, profile_pic FROM users WHERE username=%s AND password=%s", (username, password))
         user = cursor.fetchone()
         cursor.close(); conn.close()
+        
         if user:
             session['username'] = username
             session['user'] = user[0]
+            # UPDATED: Save profile_pic to session so layout.html can see it
+            session['profile_pic'] = user[1] if user[1] else "https://placehold.co/400x400?text=User"
             return redirect(url_for('admin' if user[0] == "admin" else 'dashboard'))
         return render_template('login.html', error="Invalid credentials!")
     return render_template('login.html')
@@ -99,16 +103,16 @@ def register():
         year_level = request.form['year_level']
         section_name = request.form['section']
         
-        # ADDED: Profile Picture Handling
-        profile_pic = "default_user.png"
+        profile_pic = "https://placehold.co/400x400?text=User" 
         if 'profile_pic' in request.files:
             file = request.files['profile_pic']
             if file.filename != '':
-                upload_folder = os.path.join(base_dir, '../static/uploads')
-                os.makedirs(upload_folder, exist_ok=True)
-                filename = f"user_{username}_{file.filename}"
-                file.save(os.path.join(upload_folder, filename))
-                profile_pic = filename
+                blob = put(
+                    path=f"profile_pics/{username}_{file.filename}",
+                    data=file.read(),
+                    options={"access": "public"}
+                )
+                profile_pic = blob['url']
 
         year_map = {"1": "1st", "2": "2nd", "3": "3rd", "4": "4th"}
         year_text = year_map.get(year_level, year_level)
@@ -117,7 +121,6 @@ def register():
         if cursor.fetchone():
             return "User already exists!"
 
-        # UPDATED: Insert profile_pic
         cursor.execute("""
             INSERT INTO users (username, password, role, program_name, year_level, section_name, profile_pic)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -132,7 +135,6 @@ def register():
     yrs = cursor.fetchall()
     cursor.execute("SELECT * FROM sections") 
     sects = cursor.fetchall()
-    
     cursor.close(); conn.close()
     return render_template('register.html', programs=progs, year_levels=yrs, sections=sects)
 
@@ -141,14 +143,13 @@ def dashboard():
     if session.get('user') != "student": return redirect(url_for('login'))
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    # UPDATED: Select profile_pic
     cursor.execute("SELECT program_name, section_name, profile_pic FROM users WHERE username=%s", (session['username'],))
     student = cursor.fetchone()
     cursor.close(); conn.close()
     return render_template('dashboard.html', 
                            program=student['program_name'], 
                            section=student['section_name'], 
-                           profile_pic=student.get('profile_pic', 'default_user.png'))
+                           profile_pic=student.get('profile_pic', 'https://placehold.co/400x400?text=User'))
 
 @app.route('/submit_excuse', methods=['GET', 'POST'])
 def submit_excuse():
@@ -161,18 +162,23 @@ def submit_excuse():
         absence_date = request.form['absence_date']
         reason = request.form['reason']
         file = request.files['proof']
-        filename = file.filename
-        if filename != "":
-            upload_folder = os.path.join(base_dir, '../static/uploads')
-            os.makedirs(upload_folder, exist_ok=True)
-            file.save(os.path.join(upload_folder, filename))
+        
+        # UPDATED: Using Vercel Blob for proof files
+        filename_url = ""
+        if file and file.filename != "":
+            blob = put(
+                path=f"proofs/{file.filename}",
+                data=file.read(),
+                options={"access": "public"}
+            )
+            filename_url = blob['url']
 
         cursor.execute("SELECT section_name FROM users WHERE username=%s", (student_name,))
         sec = cursor.fetchone()['section_name']
         cursor.execute("""
             INSERT INTO excuse_letters (student_name, section, absence_date, reason, proof_file)
             VALUES (%s, %s, %s, %s, %s)
-        """, (student_name, sec, absence_date, reason, filename))
+        """, (student_name, sec, absence_date, reason, filename_url))
         conn.commit()
         cursor.close(); conn.close()
         return redirect(url_for('dashboard'))
@@ -193,7 +199,7 @@ def admin():
     cursor.execute("SELECT program_name FROM programs ORDER BY program_name")
     programs = cursor.fetchall()
 
-    # UPDATED: Join with users to get u.profile_pic
+    # UPDATED: This query already correctly joins users to get profile_pic
     query = """
         SELECT e.id, e.student_name, u.program_name, e.section, e.status, u.profile_pic 
         FROM excuse_letters e 
@@ -223,7 +229,6 @@ def admin():
 def view_excuse(id):
     if session.get('user') != "admin": return redirect(url_for('login'))
     conn = get_db_connection(); cursor = conn.cursor()
-    # UPDATED: Join with users to get profile_pic
     cursor.execute("""
         SELECT e.*, u.profile_pic 
         FROM excuse_letters e 
