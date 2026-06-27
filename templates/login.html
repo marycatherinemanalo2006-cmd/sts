@@ -1,0 +1,224 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<style>
+
+body{
+    background:#f5f7fb;
+}
+
+.login-wrapper{
+    min-height:85vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.login-card{
+    width:100%;
+    max-width:450px;
+    background:#ffffff;
+    border:none;
+    border-radius:24px;
+    padding:40px;
+    box-shadow:0 20px 40px rgba(0,0,0,.08);
+}
+
+.system-logo{
+    width:80px;
+    height:80px;
+    background:#e8f5e9;
+    color:#166534;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 20px;
+    font-size:34px;
+}
+
+.system-title{
+    font-size:28px;
+    font-weight:800;
+    color:#166534;
+    text-align:center;
+    margin-bottom:6px;
+}
+
+.system-subtitle{
+    text-align:center;
+    color:#6b7280;
+    font-size:14px;
+    margin-bottom:35px;
+}
+
+.form-label{
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:#4b5563;
+    margin-bottom:8px;
+}
+
+.form-control{
+    height:52px;
+    border-radius:12px;
+    border:1px solid #d1d5db;
+    background:#fafafa;
+}
+
+.form-control:focus{
+    border-color:#16a34a;
+    box-shadow:0 0 0 4px rgba(22,163,74,.12);
+}
+
+.input-group-text{
+    background:#fafafa;
+    border-right:none;
+    border-radius:12px 0 0 12px;
+}
+
+.input-group .form-control{
+    border-left:none;
+}
+
+.btn-login{
+    width:100%;
+    height:52px;
+    border:none;
+    border-radius:12px;
+    background:#166534;
+    color:white;
+    font-weight:700;
+    transition:.3s;
+}
+
+.btn-login:hover{
+    background:#14532d;
+    transform:translateY(-2px);
+}
+
+.btn-register{
+    width:100%;
+    height:52px;
+    border-radius:12px;
+    border:1px solid #16a34a;
+    color:#166534;
+    font-weight:700;
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-top:12px;
+    transition:.3s;
+}
+
+.btn-register:hover{
+    background:#166534;
+    color:white;
+}
+
+.alert{
+    border:none;
+    border-radius:12px;
+}
+
+.footer-note{
+    text-align:center;
+    margin-top:25px;
+    color:#9ca3af;
+    font-size:13px;
+}
+
+</style>
+
+<div class="login-wrapper">
+
+    <div class="login-card">
+
+        <div class="system-logo">
+            <i class="bi bi-calendar-check-fill"></i>
+        </div>
+
+        <div class="system-title">
+            Absence Management System
+        </div>
+
+        <div class="system-subtitle">
+            Student Excuse Letter Management Portal
+        </div>
+
+        <form method="POST">
+
+            {% if error %}
+            <div class="alert alert-danger mb-4">
+                <i class="bi bi-exclamation-circle-fill me-2"></i>
+                Invalid username or password.
+            </div>
+            {% endif %}
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Full Name
+                </label>
+
+                <div class="input-group">
+
+                    <span class="input-group-text">
+                        <i class="bi bi-person"></i>
+                    </span>
+
+                    <input type="text"
+                           name="username"
+                           class="form-control"
+                           placeholder="Enter your full name"
+                           required>
+
+                </div>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="form-label">
+                    Password
+                </label>
+
+                <div class="input-group">
+
+                    <span class="input-group-text">
+                        <i class="bi bi-lock"></i>
+                    </span>
+
+                    <input type="password"
+                           name="password"
+                           class="form-control"
+                           placeholder="Enter your password"
+                           required>
+
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn-login">
+                Login
+            </button>
+
+            <a href="/register" class="btn-register">
+                <i class="bi bi-person-plus-fill me-2"></i>
+                Create Student Account
+            </a>
+
+        </form>
+
+        <div class="footer-note">
+            © 2026 Absence Management System
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

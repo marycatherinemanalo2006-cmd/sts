@@ -1,0 +1,220 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container-fluid px-4 py-3">
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+
+    <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center">
+
+        <div class="d-flex align-items-center">
+
+            <a href="/dashboard"
+               class="btn btn-outline-secondary me-3">
+
+                <i class="bi bi-arrow-left"></i>
+                Back
+
+            </a>
+
+            <div>
+                <h4 class="fw-bold mb-0">
+                    My Excuse History
+                </h4>
+
+                <small class="text-muted">
+                    View your submitted excuse letters and their status.
+                </small>
+            </div>
+
+        </div>
+
+        <a href="/dashboard" class="btn-close"></a>
+
+    </div>
+
+    <div class="card-body p-0">
+
+        {% if letters %}
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Date of Absence</th>
+                        <th>Reason</th>
+                        <th>Proof</th>
+                        <th>Status</th>
+                        <th>Excuse Letter</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for letter in letters %}
+
+                    <tr>
+
+                        <td>
+                            <span class="text-muted fw-semibold">
+                                #{{ letter[0] }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <strong>
+                                {{ letter[3] }}
+                            </strong>
+                        </td>
+
+                        <td>
+
+                            <div class="reason-text">
+                                {{ letter[4] }}
+                            </div>
+
+                        </td>
+
+                        <td>
+
+                            {% if letter[5] %}
+
+                            <a href="{{ url_for('static', filename='uploads/' + letter[5]) }}"
+                               target="_blank"
+                               class="btn btn-outline-secondary btn-sm">
+
+                                <i class="bi bi-file-earmark-text"></i>
+                                View
+
+                            </a>
+
+                            {% else %}
+
+                            <span class="text-muted">
+                                No File
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            {% if letter[6] == 'Approved' %}
+
+                            <span class="badge bg-success">
+                                Approved
+                            </span>
+
+                            {% elif letter[6] == 'Rejected' %}
+
+                            <span class="badge bg-danger">
+                                Rejected
+                            </span>
+
+                            {% else %}
+
+                            <span class="badge bg-warning text-dark">
+                                Pending
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            <a href="/student_excuse/{{ letter[0] }}"
+                               class="btn btn-primary btn-sm">
+
+                                <i class="bi bi-eye"></i>
+                                View
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="text-center py-5">
+
+            <i class="bi bi-folder2-open display-1 text-muted"></i>
+
+            <h5 class="mt-3">
+                No Excuse Letters Found
+            </h5>
+
+            <p class="text-muted">
+                You have not submitted any excuse letters yet.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+</div>
+
+<style>
+
+.container-fluid{
+    max-width:100%;
+}
+
+.card{
+    min-height:75vh;
+}
+
+.table thead th{
+    background:#f8fafc;
+    color:#475569;
+    font-size:13px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    border:none;
+    padding:18px;
+}
+
+.table td{
+    padding:18px;
+    vertical-align:middle;
+}
+
+.reason-text{
+    max-width:450px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.badge{
+    padding:8px 14px;
+    font-size:12px;
+    border-radius:20px;
+}
+
+.table tbody tr:hover{
+    background:#f8fafc;
+}
+
+</style>
+
+{% endblock %}

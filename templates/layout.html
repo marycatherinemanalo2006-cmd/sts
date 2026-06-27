@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absent Management System</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family:'Inter',sans-serif;
+            background:#f5f7fa;
+            color:#1f2937;
+            min-height:100vh;
+        }
+
+        /* NAVBAR */
+
+        .navbar{
+            background:#ffffff;
+            border-bottom:1px solid #e5e7eb;
+            padding:14px 0;
+        }
+
+        .navbar-brand{
+            font-size:1.2rem;
+            font-weight:800;
+            color:#166534 !important;
+            letter-spacing:.3px;
+        }
+
+        .navbar-brand:hover{
+            color:#14532d !important;
+        }
+
+        /* CARDS */
+
+        .card{
+            border:none;
+            border-radius:18px;
+            box-shadow:0 8px 25px rgba(0,0,0,.05);
+        }
+
+        /* BUTTONS */
+
+        .btn-primary{
+            background:#166534;
+            border:none;
+            border-radius:10px;
+            font-weight:600;
+        }
+
+        .btn-primary:hover{
+            background:#14532d;
+        }
+
+        /* INPUTS */
+
+        .form-control{
+            border-radius:10px;
+            border:1px solid #d1d5db;
+            padding:12px 14px;
+        }
+
+        .form-control:focus{
+            border-color:#166534;
+            box-shadow:0 0 0 3px rgba(22,101,52,.12);
+        }
+
+        .notification-badge{
+            font-size:.65rem;
+        }
+
+    </style>
+</head>
+
+<body>
+
+{% if session.get('username') %}
+
+<nav class="navbar sticky-top shadow-sm">
+
+    <div class="container">
+
+        <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+            <i class="bi bi-clipboard2-check-fill"></i>
+            Learner's Attendance Management System
+        </a>
+
+        <div class="d-flex align-items-center">
+
+            {% if session.get('user') == 'student' %}
+            <div class="me-4 position-relative">
+
+                <a href="/my_excuses"
+                   class="text-dark text-decoration-none">
+
+                    <i class="bi bi-bell-fill fs-5"></i>
+
+                    {% if notify_count > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge">
+                        {{ notify_count }}
+                    </span>
+                    {% endif %}
+
+                </a>
+
+            </div>
+            {% endif %}
+
+            <span class="me-3 text-muted small">
+                Welcome,
+                <strong>{{ session['username'] }}</strong>
+            </span>
+
+            <a href="/logout"
+               class="btn btn-outline-danger btn-sm px-3 fw-semibold">
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+{% endif %}
+
+{% if session.get('username') %}
+<div class="container py-4">
+{% else %}
+<div class="container-fluid p-0 m-0">
+{% endif %}
+
+    {% block content %}
+    {% endblock %}
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
