@@ -2,6 +2,9 @@ from flask import Flask, render_template, request, redirect, session, url_for
 import mysql.connector
 import os
 from vercel_blob import put  # NEW: Added for cloud storage
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # CHANGED: Added paths for templates and static so Vercel can find them from the /api folder
 app = Flask(__name__, 
