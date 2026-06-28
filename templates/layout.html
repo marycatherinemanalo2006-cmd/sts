@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absent Management System</title>
+    <title>Attendance Management System</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -16,7 +16,6 @@
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
-
         *{
             margin:0;
             padding:0;
@@ -31,62 +30,53 @@
         }
 
         /* NAVBAR */
-
         .navbar{
             background:#ffffff;
             border-bottom:1px solid #e5e7eb;
-            padding:14px 0;
+            padding:12px 0;
         }
 
         .navbar-brand{
-            font-size:1.2rem;
+            font-size:1.1rem;
             font-weight:800;
             color:#166534 !important;
             letter-spacing:.3px;
         }
 
-        .navbar-brand:hover{
-            color:#14532d !important;
+        /* DROPDOWN CUSTOM */
+        .no-caret::after {
+            display: none !important;
         }
 
-        /* CARDS */
-
-        .card{
-            border:none;
-            border-radius:18px;
-            box-shadow:0 8px 25px rgba(0,0,0,.05);
+        .dropdown-menu {
+            border-radius: 15px;
+            padding: 10px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,.1) !important;
         }
 
-        /* BUTTONS */
-
-        .btn-primary{
-            background:#166534;
-            border:none;
-            border-radius:10px;
-            font-weight:600;
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: 500;
         }
 
-        .btn-primary:hover{
-            background:#14532d;
-        }
-
-        /* INPUTS */
-
-        .form-control{
-            border-radius:10px;
-            border:1px solid #d1d5db;
-            padding:12px 14px;
-        }
-
-        .form-control:focus{
-            border-color:#166534;
-            box-shadow:0 0 0 3px rgba(22,101,52,.12);
-        }
-
+        /* NOTIFICATION BADGE */
         .notification-badge{
             font-size:.65rem;
         }
 
+        /* ATTACHMENT MODAL */
+        #attachmentModal .modal-content {
+            background-color: transparent;
+            border: none;
+        }
+        
+        .btn-close-white {
+            filter: invert(1) grayscale(100%) brightness(200%);
+            opacity: 0.8;
+        }
     </style>
 </head>
 
@@ -95,68 +85,143 @@
 {% if session.get('username') %}
 
 <nav class="navbar sticky-top shadow-sm">
-
     <div class="container">
 
         <a class="navbar-brand d-flex align-items-center gap-2" href="/">
             <i class="bi bi-clipboard2-check-fill"></i>
-            Learner's Attendance Management System
+            Attendance Management
         </a>
 
         <div class="d-flex align-items-center">
 
+            <!-- NOTIFICATIONS (Student Only) -->
             {% if session.get('user') == 'student' %}
             <div class="me-4 position-relative">
-
-                <a href="/my_excuses"
-                   class="text-dark text-decoration-none">
-
+                <a href="/my_excuses" class="text-dark text-decoration-none">
                     <i class="bi bi-bell-fill fs-5"></i>
-
                     {% if notify_count > 0 %}
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge">
                         {{ notify_count }}
                     </span>
                     {% endif %}
-
                 </a>
-
             </div>
             {% endif %}
 
-             <span class="me-2 text-muted small">
+            <!-- WELCOME TEXT -->
+            <span class="me-3 text-muted d-none d-md-inline" style="font-size: 14px;">
                 Welcome, <strong>{{ session['username'] }}</strong>
             </span>
 
-            <!-- ACCOUNT ICON -->
-            <img src="{{ session.get('profile_pic', 'https://placehold.co/400x400?text=User') }}" 
-                 class="rounded-circle border me-3" 
-                 style="width: 35px; height: 35px; object-fit: cover; border: 2px solid #166534 !important;">
+            <!-- PROFILE DISPLAY -->
+            {% if session.get('user') == 'admin' %}
+                <!-- ADMIN: Badge icon only -->
+                <div class="me-3">
+                    <i class="bi bi-person-badge-fill fs-3 text-success"></i>
+                </div>
+            {% else %}
+                <!-- STUDENT: Profile Image with Dropdown -->
+                <div class="dropdown me-3">
+                    <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle no-caret" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="{{ session.get('profile_pic', 'https://placehold.co/400x400?text=User') }}" 
+                             class="rounded-circle border shadow-sm" 
+                             style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #166534 !important;">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow mt-2" aria-labelledby="dropdownUser">
+                        <li><h6 class="dropdown-header">Manage Photo</h6></li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="#" data-bs-toggle="modal" data-bs-target="#changePhotoModal">
+                                <i class="bi bi-camera text-success"></i> Change Photo
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger" href="/delete_profile_pic" onclick="return confirm('Remove profile picture?')">
+                                <i class="bi bi-trash"></i> Remove Photo
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            {% endif %}
 
             <a href="/logout" class="btn btn-outline-danger btn-sm px-3 fw-semibold">
                 Logout
             </a>
 
         </div>
-
     </div>
-
 </nav>
 
+<!-- MODAL CHANGE PHOTO (For Students Only) -->
+{% if session.get('user') == 'student' %}
+<div class="modal fade" id="changePhotoModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content border-0 shadow" style="border-radius: 20px;">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold">Update Photo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/update_profile_pic" method="POST" enctype="multipart/form-data">
+          <div class="modal-body">
+            <input type="file" name="new_profile_pic" class="form-control" accept="image/*" required>
+          </div>
+          <div class="modal-footer border-0 pt-0">
+            <button type="submit" class="btn btn-success w-100 py-2 fw-bold" style="border-radius: 12px;">Update Now</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
 {% endif %}
 
-{% if session.get('username') %}
-<div class="container py-4">
-{% else %}
-<div class="container-fluid p-0 m-0">
+<!-- UNIVERSAL PREVIEW MODAL -->
+<div class="modal fade" id="attachmentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 p-0 justify-content-end">
+                <!-- X BUTTON TO CLOSE -->
+                <button type="button" class="btn-close btn-close-white fs-4 p-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0 text-center">
+                <img src="" id="modalImage" class="img-fluid rounded shadow-lg" style="max-height: 85vh;">
+                <div id="fileFallback" class="mt-3 d-none p-5 bg-white rounded">
+                    <i class="bi bi-file-earmark-pdf display-1 text-danger"></i>
+                    <h4 class="mt-3">Preview not available</h4>
+                    <a href="" id="downloadLink" class="btn btn-primary mt-3" target="_blank">Open/Download File</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endif %}
 
-    {% block content %}
-    {% endblock %}
-
+<div class="{% if session.get('username') %}container py-4{% else %}container-fluid p-0 m-0{% endif %}">
+    {% block content %}{% endblock %}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function previewAttachment(url) {
+        const modalImg = document.getElementById('modalImage');
+        const fallback = document.getElementById('fileFallback');
+        const downloadLink = document.getElementById('downloadLink');
+        const isImage = /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(url);
+        
+        if (isImage) {
+            modalImg.src = url;
+            modalImg.classList.remove('d-none');
+            fallback.classList.add('d-none');
+        } else {
+            modalImg.classList.add('d-none');
+            fallback.classList.remove('d-none');
+            downloadLink.href = url;
+        }
+        
+        var myModal = new bootstrap.Modal(document.getElementById('attachmentModal'));
+        myModal.show();
+    }
+</script>
 
 </body>
 </html>

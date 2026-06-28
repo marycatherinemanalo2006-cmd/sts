@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 import mysql.connector
 import os
-from vercel_blob import put  # NEW: Added for cloud storage
+from vercel_blob import put
 from dotenv import load_dotenv
 
+# Load environment variables mula sa .env file
 load_dotenv()
 
-# CHANGED: Added paths for templates and static so Vercel can find them from the /api folder
 app = Flask(__name__, 
             template_folder='../templates', 
             static_folder='../static')
@@ -29,41 +29,6 @@ db_config = {
 def get_db_connection():
     return mysql.connector.connect(**db_config)
 
-def seed_data():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        print("Connecting to database for seeding...")
-
-        programs = ["BPA", "BSCS", "BSCRIM", "BSMA"]
-        for p in programs:
-            cursor.execute("INSERT IGNORE INTO programs (program_name) VALUES (%s)", (p,))
-
-        years = ['1st', '2nd', '3rd', '4th']
-        for y in years:
-            cursor.execute("INSERT IGNORE INTO year_levels (year_level) VALUES (%s)", (y,))
-
-        cursor.execute("SELECT COUNT(*) FROM sections")
-        if cursor.fetchone()[0] == 0:
-            for program_name in programs:
-                for year in years:
-                    year_num = year[0]
-                    for letter in ['A', 'B', 'C', 'D', 'E', 'F']:
-                        full_section_name = f"{year_num}{letter}"
-                        cursor.execute("""
-                            INSERT IGNORE INTO sections (section_name, year_level, program_name)
-                            VALUES (%s, %s, %s)
-                        """, (full_section_name, year, program_name))
-
-        cursor.execute("INSERT IGNORE INTO users (username, password, role) VALUES (%s, %s, %s)", ("admin", "123", "admin"))
-        conn.commit()
-        print("Database seeded successfully!")
-    except Exception as e:
-        print(f"Error during seeding: {e}")
-    finally:
-        cursor.close()
-        conn.close()
-
 # ROUTES
 
 @app.route('/')
@@ -80,7 +45,6 @@ def login():
         password = request.form['password']
         conn = get_db_connection()
         cursor = conn.cursor()
-        # UPDATED: Added profile_pic to the SELECT statement
         cursor.execute("SELECT role, profile_pic FROM users WHERE username=%s AND password=%s", (username, password))
         user = cursor.fetchone()
         cursor.close(); conn.close()
@@ -88,7 +52,7 @@ def login():
         if user:
             session['username'] = username
             session['user'] = user[0]
-            # UPDATED: Save profile_pic to session so layout.html can see it
+            # I-save ang profile pic sa session para sa layout.html
             session['profile_pic'] = user[1] if user[1] else "https://placehold.co/400x400?text=User"
             return redirect(url_for('admin' if user[0] == "admin" else 'dashboard'))
         return render_template('login.html', error="Invalid credentials!")
@@ -100,22 +64,29 @@ def register():
     cursor = conn.cursor(dictionary=True)
 
     if request.method == 'POST':
-        username = request.form['username'].strip()
-        password = request.form['password']
-        program_name = request.form['program']
-        year_level = request.form['year_level']
-        section_name = request.form['section']
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
+        program_name = request.form.get('program', '')
+        year_level = request.form.get('year_level', '')
+        section_name = request.form.get('section', '')
         
         profile_pic = "https://placehold.co/400x400?text=User" 
         if 'profile_pic' in request.files:
             file = request.files['profile_pic']
             if file.filename != '':
-                blob = put(
-                    path=f"profile_pics/{username}_{file.filename}",
-                    data=file.read(),
-                    options={"access": "public"}
-                )
-                profile_pic = blob['url']
+                try:
+                    blob = put(
+                        path=f"profile_pics/{username}_{file.filename}",
+                        data=file.read(),
+                        options={
+                            "access": "public",
+                            "add_random_suffix": True  # Fix para sa overwriting error
+                        }
+                    )
+                    profile_pic = blob['url']
+                except Exception as e:
+                    print(f"Upload Error: {e}")
+                    profile_pic = "https://placehold.co/400x400?text=UploadFailed"
 
         year_map = {"1": "1st", "2": "2nd", "3": "3rd", "4": "4th"}
         year_text = year_map.get(year_level, year_level)
@@ -140,6 +111,53 @@ def register():
     sects = cursor.fetchall()
     cursor.close(); conn.close()
     return render_template('register.html', programs=progs, year_levels=yrs, sections=sects)
+
+@app.route('/update_profile_pic', methods=['POST'])
+def update_profile_pic():
+    if 'username' not in session: return redirect(url_for('login'))
+    
+    if 'new_profile_pic' in request.files:
+        file = request.files['new_profile_pic']
+        if file.filename != '':
+            try:
+                blob = put(
+                    path=f"profile_pics/{session['username']}_{file.filename}",
+                    data=file.read(),
+                    options={
+                        "access": "public",
+                        "add_random_suffix": True
+                    }
+                )
+                new_url = blob['url']
+                
+                conn = get_db_connection()
+                cursor = conn.cursor()
+                cursor.execute("UPDATE users SET profile_pic=%s WHERE username=%s", (new_url, session['username']))
+                conn.commit()
+                cursor.close(); conn.close()
+                
+                session['profile_pic'] = new_url # Update UI immediately
+            except Exception as e:
+                print(f"Update Error: {e}")
+
+    return redirect(request.referrer or url_for('dashboard'))
+
+@app.route('/delete_profile_pic')
+def delete_profile_pic():
+    if 'username' not in session: return redirect(url_for('login'))
+    
+    default_img = "https://placehold.co/400x400?text=User"
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE users SET profile_pic=%s WHERE username=%s", (default_img, session['username']))
+        conn.commit()
+        cursor.close(); conn.close()
+        session['profile_pic'] = default_img
+    except Exception as e:
+        print(f"Delete Error: {e}")
+        
+    return redirect(request.referrer or url_for('dashboard'))
 
 @app.route('/dashboard')
 def dashboard():
@@ -166,15 +184,17 @@ def submit_excuse():
         reason = request.form['reason']
         file = request.files['proof']
         
-        # UPDATED: Using Vercel Blob for proof files
         filename_url = ""
         if file and file.filename != "":
-            blob = put(
-                path=f"proofs/{file.filename}",
-                data=file.read(),
-                options={"access": "public"}
-            )
-            filename_url = blob['url']
+            try:
+                blob = put(
+                    path=f"proofs/{file.filename}",
+                    data=file.read(),
+                    options={"access": "public", "add_random_suffix": True}
+                )
+                filename_url = blob['url']
+            except:
+                filename_url = ""
 
         cursor.execute("SELECT section_name FROM users WHERE username=%s", (student_name,))
         sec = cursor.fetchone()['section_name']
@@ -202,7 +222,6 @@ def admin():
     cursor.execute("SELECT program_name FROM programs ORDER BY program_name")
     programs = cursor.fetchall()
 
-    # UPDATED: This query already correctly joins users to get profile_pic
     query = """
         SELECT e.id, e.student_name, u.program_name, e.section, e.status, u.profile_pic 
         FROM excuse_letters e 

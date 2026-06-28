@@ -59,19 +59,15 @@
             </div>
 
             {% if letter[5] %}
-            <div class="mb-3">
-                <label class="fw-bold">
-                    Attachment
-                </label>
-                <br>
-
-                <a href="{{ url_for('static', filename='uploads/' + letter[5]) }}"
-                   target="_blank"
-                   class="btn btn-outline-primary">
-                    View Attachment
-                </a>
-            </div>
-            {% endif %}
+<div class="mb-3">
+    <label class="fw-bold">Attachment</label><br>
+    <button type="button" 
+            onclick="previewAttachment('{{ letter[5] }}')"
+            class="btn btn-outline-primary mt-2">
+        View Attachment
+    </button>
+</div>
+{% endif %}
 
             <div class="mb-4">
 
