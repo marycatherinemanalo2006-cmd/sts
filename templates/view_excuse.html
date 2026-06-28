@@ -6,7 +6,7 @@
 
 <!-- ADDED: Student Profile Header Section -->
 <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
-    <img src="{{ url_for('static', filename='uploads/' + (letter[9] if letter[9] else 'default_user.png')) }}" 
+    <img src="{{ letter[9] if letter[9] else 'https://placehold.co/400x400?text=User' }}" 
          class="rounded-circle me-3 border shadow-sm" 
          style="width: 80px; height: 80px; object-fit: cover; background-color: #f8f9fa;">
     <div>
@@ -44,16 +44,10 @@
     <br>
 
     {% if letter[5] %}
-
-        <a href="{{ url_for('static', filename='uploads/' + letter[5]) }}"
-           target="_blank"
-           class="btn btn-info text-white mt-2">
-
-            View Attachment
-
-        </a>
-
-    {% else %}
+    <a href="{{ letter[5] }}" target="_blank" class="btn btn-info text-white mt-2">
+        View Attachment
+    </a>
+{% endif %}
 
         <p class="text-muted">
             No attachment uploaded.
